@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "803518091758",
+    "project_id": "teamnotification-ae823",
+    "storage_bucket": "teamnotification-ae823.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:803518091758:android:6598d969cd2e1ceff27eff",
+        "android_client_info": {
+          "package_name": "com.example.team_notification"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6BptXwrBMKPjAjCaeGw4V2PWRsWaR7SI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
