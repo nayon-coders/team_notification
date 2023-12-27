@@ -1,0 +1,6 @@
+key properties
+
+storePassword=Nayon1234
+keyPassword=Nayon1234
+keyAlias=upload
+storeFile=upload-keystore.jks
