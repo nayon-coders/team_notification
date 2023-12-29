@@ -21,11 +21,13 @@ class AuthController{
       }
     );
     print("res === ${res.body}");
+  if(res.statusCode == 200){
     _prefs.setString("token", jsonDecode(res.body)["token"]);
     _prefs.setString("full_name", "${jsonDecode(res.body)["user"]["fname"]} ${jsonDecode(res.body)["user"]["lname"]}");
     _prefs.setString("email", jsonDecode(res.body)["user"]["email"]);
     _prefs.setString("user_id", jsonDecode(res.body)["user"]["id"].toString());
     _prefs.setString("device_token", jsonDecode(res.body)["user"]["device_token"]);
+  }
     return res;
   }
 

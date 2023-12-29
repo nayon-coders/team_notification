@@ -7,6 +7,7 @@ import 'package:userapp/controller/user_controller/userController.dart';
 import 'package:userapp/model/notification_model/notification_model.dart';
 import 'package:userapp/model/user_model/user_model.dart';
 import 'package:userapp/utilitys/app_color.dart';
+import 'package:userapp/view/bottom_navigation/bottom_navigation.dart';
 import 'package:userapp/view/notification/view_notification.dart';
 import 'package:intl/intl.dart';
 import '../notification/admin_set_notification.dart';
@@ -36,7 +37,6 @@ class _HomeState extends State<Home> {
     setState(() {
       email = _pref.getString("email");
       full_name = _pref.getString("full_name");
-
       user_id = _pref.getString("user_id");
     });
       var res = await NotificationController.getNotificationList();
@@ -63,7 +63,7 @@ class _HomeState extends State<Home> {
     // TODO: implement initState
     super.initState();
     getLoginUserInfo();
-    _getNotificationModel = NotificationController.getNotificationList();
+    _getFuture();
   }
 
 
@@ -154,7 +154,7 @@ class _HomeState extends State<Home> {
             ),
 
 
-            _allNotification !=null && _allNotification!.isNotEmpty
+            _allNotification != null && _allNotification!.isNotEmpty
                 ? SizedBox(
               child: ListView.builder(
                 shrinkWrap: true,
@@ -185,18 +185,18 @@ class _HomeState extends State<Home> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            InkWell(
+                            email != null && email == AppConfig.ADMIN_MIAL ? InkWell(
                               onTap: ()=>Get.to(EditNotification(notification: data,)),
                               child: Icon(Icons.edit, size: 20, color: Colors.amber,),
-                            ),
+                            ) : Center(),
                             InkWell(
                               onTap: ()=>Get.to(ViewNotification(notificationId: data.id.toString(),)),
                               child: Icon(Icons.remove_red_eye, size: 20, color: Colors.green,),
                             ),
-                            InkWell(
-                              onTap: ()=> showDeletePoup(data!.id.toString()),
+                            email != null && email == AppConfig.ADMIN_MIAL ? InkWell(
+                              onTap: ()=> showDeletePoup(data!.id.toString(), index),
                               child: Icon(Icons.delete, size: 20, color: Colors.red,),
-                            )
+                            ) : Center()
                           ],
                         ),
                       ),
@@ -222,7 +222,7 @@ class _HomeState extends State<Home> {
 
 
   //show alert for delete notification
-   showDeletePoup(id) async{
+   showDeletePoup(id, int index) async{
      return showDialog<void>(
        context: context,
        builder: (BuildContext context) {
@@ -245,7 +245,7 @@ class _HomeState extends State<Home> {
              TextButton(
                onPressed: () {
                  Navigator.of(context).pop();
-                 _deleteNotification(id);
+                 _deleteNotification(id, index);
                },
                child: Text('Yes'),
              ),
@@ -258,7 +258,7 @@ class _HomeState extends State<Home> {
 
    //delete notification
   bool isDelete = false;
-  void _deleteNotification(id) async{
+  void _deleteNotification(id, index) async{
     setState(() =>isDelete=true);
     deleteLoading();
     var res = await NotificationController.deleteNotification(id: id);
@@ -268,6 +268,10 @@ class _HomeState extends State<Home> {
         backgroundColor: Colors.green,
         duration: Duration(milliseconds: 3000),
       ));
+      setState(() {
+        _allNotification.removeAt(index);
+      });
+      setState(() {});
     }else{
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("Something went wrong."),
@@ -275,8 +279,7 @@ class _HomeState extends State<Home> {
         duration: Duration(milliseconds: 3000),
       ));
     }
-    _getNotificationModel = NotificationController.getNotificationList();
-    Navigator.pop(context);
+    Navigator.push(context, MaterialPageRoute(builder: (context)=>AppBottomNavigation()));
     setState(() =>isDelete=false);
   }
 
@@ -290,6 +293,10 @@ class _HomeState extends State<Home> {
         );
       },
     );
+  }
+
+  Future<NotificationListModel> _getFuture() {
+    return _getNotificationModel = NotificationController.getNotificationList();
   }
 
 }

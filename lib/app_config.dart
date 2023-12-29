@@ -5,7 +5,7 @@ class AppConfig{
 
   //app name
   static const String AppName = "Car Rent";
-  static const String ADMIN_MIAL = "admin@gmail.com";
+  static const String ADMIN_MIAL = "admin2023@gmail.com";
   static const String ONESIGNA_API = "ed227ee2-b0a5-4b0b-83b8-ba9dc3dd6a36";
 
 
@@ -23,6 +23,7 @@ class AppConfig{
   static const String USERS_LIST = "$Baseurl/user-list";
   static const String SINGLE_USER = "$Baseurl/user/show/";
   static const String NOTIFICATION_LIST = "$Baseurl/notification";
+  static const String NOTIFICATION_UPDATE = "$Baseurl/notification/update/";
   static const String UPDATE_PROFILE_IMAGE = "$Baseurl/profile-image/upload/";
   static const String CHANGE_PASSWORD = "$Baseurl/change-password/";
 

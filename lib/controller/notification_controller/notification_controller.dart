@@ -43,6 +43,40 @@ class NotificationController{
 
   }
 
+  //ccreate notification
+  static Future editNotification({required String ID, required String title, required String msg,required String selectedTime, required String seletedDate,required List userList, required dynamic image,     })async{
+    bool isSuccess = false;
+    SharedPreferences _pref = await SharedPreferences.getInstance();
+    var token = _pref.getString("token");
+    try {
+      var request = http.MultipartRequest('POST', Uri.parse(AppConfig.NOTIFICATION_UPDATE+"$ID"));
+      if(image != null){
+        request.files.add(await http.MultipartFile.fromPath('image', image.path));
+      }
+      request.fields['date'] = seletedDate;
+      request.fields['time'] = selectedTime;
+      request.fields['title'] = title;
+      request.fields['message'] = msg;
+      request.fields['user_list'] = userList.toString();
+
+      var response = await request.send();
+      if (response.statusCode == 200) {
+        isSuccess = true;
+        print('Image uploaded successfully');
+        print('Failed to upload image. Status code: ${response.stream.toString()}');
+      } else {
+        isSuccess = false;
+        print('Failed to upload image. Status code: ${response.stream.toString()}');
+      }
+      return response;
+    } catch (error) {
+      isSuccess = true;
+      print('Error uploading image: $error');
+    }
+
+
+  }
+
 
   //static
   static Future<NotificationListModel> getNotificationList()async{

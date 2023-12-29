@@ -35,7 +35,7 @@ class _LoginState extends State<Login> {
   late bool _passwordVisible;
   @override
   void initState() {
-    _passwordVisible = false;
+    _passwordVisible = true;
     getDeviceTokenToSendNotification();
   }
 

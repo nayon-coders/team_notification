@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -50,6 +51,18 @@ class _EditNotificationState extends State<EditNotification> {
     // TODO: implement initState
     super.initState();
     _getUserList();
+
+    title.text = widget.notification!.title.toString();
+    msg.text = widget.notification!.message.toString();
+    selectedTime = widget.notification!.time.toString();
+    uploadTimeToServer = widget.notification!.time.toString();
+    selectedDate = widget.notification!.date.toString();
+    for(var i in widget.notification!.userList!){
+      selectedUserList.add(i.id.toString());
+      _getUserToken.add(i!.deviceToken!);
+    }
+
+
   }
   @override
   Widget build(BuildContext context) {
@@ -58,7 +71,7 @@ class _EditNotificationState extends State<EditNotification> {
         backgroundColor: AppColor.white,
         appBar: AppBar(
           backgroundColor: AppColor.mainColor,
-          title: Text("Setup New Notification"),
+          title: const Text("Edit New Notification"),
         ),
         body: SingleChildScrollView(
           child: Container (
@@ -203,10 +216,10 @@ class _EditNotificationState extends State<EditNotification> {
             height: 80,
             decoration: BoxDecoration(
                 color: AppColor.mainColor,
-                borderRadius: BorderRadius.circular(10)
+               // borderRadius: BorderRadius.circular(10)
             ),
             child: Center(
-              child: isNotification ? CircularProgressIndicator(color: Colors.white,)  : Text("Add New Notification",
+              child: isNotification ? CircularProgressIndicator(color: Colors.white,)  : Text("Update New Notification",
                 style: TextStyle(
                     fontWeight: FontWeight.w600,
                     color: AppColor.white,
@@ -327,46 +340,48 @@ class _EditNotificationState extends State<EditNotification> {
                         ],
                       ),
                       SizedBox(height: 20,),
-                      ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: user!.length,
-                        itemBuilder: (_, index){
-                          return Container(
-                            margin: EdgeInsets.only(bottom: 5),
-                            decoration: BoxDecoration(
-                                color: Colors.grey.shade200
-                            ),
-                            child: ListTile(
-                              onTap: (){
-                                setState((){
-                                  if(user![index]!.deviceToken != null){
-                                    if(_getUserToken.contains("${user![index]!.deviceToken}")){
-                                      _getUserToken.remove("${user![index]!.deviceToken}");
-                                      selectedUserList.remove(user![index]!.id.toString());
-                                    }else{
-                                      selectedUserList.add(user![index]!.id.toString());
-                                      _getUserToken.add("${user![index]!.deviceToken}");
-                                    }
-                                  }else{
-                                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                                      content: Text("You can not send him the notification. He/She doesn't have device token."),
-                                      backgroundColor: Colors.red,
-                                      duration: Duration(milliseconds: 3000),
-                                    ));
-                                  }
-                                });
-                              },
-                              leading: ClipRRect(
-                                borderRadius: BorderRadius.circular(100),
-                                child: Image.network("https://marketplace.canva.com/EAFHfL_zPBk/1/0/1600w/canva-yellow-inspiration-modern-instagram-profile-picture-kpZhUIzCx_w.jpg",
-                                  height: 50, width: 50,
-                                ),
+                      Expanded(
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: user!.length,
+                          itemBuilder: (_, index){
+                            return Container(
+                              margin: EdgeInsets.only(bottom: 5),
+                              decoration: BoxDecoration(
+                                  color: Colors.grey.shade200
                               ),
-                              title: Text("${user![index]!.fname}"),
-                              trailing: _getUserToken.isNotEmpty && _getUserToken.contains(user![index]!.deviceToken) ? Icon(Icons.check_circle, color: AppColor.mainColor,) : SizedBox(width: 10,),
-                            ),
-                          );
-                        },
+                              child: ListTile(
+                                onTap: (){
+                                  setState((){
+                                    if(user![index]!.deviceToken != null){
+                                      if(_getUserToken.contains("${user![index]!.deviceToken}")){
+                                        _getUserToken.remove("${user![index]!.deviceToken}");
+                                        selectedUserList.remove(user![index]!.id.toString());
+                                      }else{
+                                        selectedUserList.add(user![index]!.id.toString());
+                                        _getUserToken.add("${user![index]!.deviceToken}");
+                                      }
+                                    }else{
+                                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                                        content: Text("You can not send him the notification. He/She doesn't have device token."),
+                                        backgroundColor: Colors.red,
+                                        duration: Duration(milliseconds: 3000),
+                                      ));
+                                    }
+                                  });
+                                },
+                                leading: ClipRRect(
+                                  borderRadius: BorderRadius.circular(100),
+                                  child: Image.network("https://marketplace.canva.com/EAFHfL_zPBk/1/0/1600w/canva-yellow-inspiration-modern-instagram-profile-picture-kpZhUIzCx_w.jpg",
+                                    height: 50, width: 50,
+                                  ),
+                                ),
+                                title: Text("${user![index]!.fname}"),
+                                trailing: _getUserToken.isNotEmpty && _getUserToken.contains(user![index]!.deviceToken) ? Icon(Icons.check_circle, color: AppColor.mainColor,) : SizedBox(width: 10,),
+                              ),
+                            );
+                          },
+                        ),
                       ),
                     ],
                   ),
@@ -380,7 +395,7 @@ class _EditNotificationState extends State<EditNotification> {
                   });
                   Navigator.of(context).pop();
                 },
-                child: Text('Close'),
+                child: Text('OK'),
               ),
             ],
           ),
@@ -422,11 +437,6 @@ class _EditNotificationState extends State<EditNotification> {
     }else{
       setState(() => errorTime = null);
     }
-    if(_image == null){
-      setState(() => errorImage = "Choose Image");
-    }else{
-      setState(() => errorImage = null);
-    }
     if(msg.text.isEmpty){
       setState(() => errorMsg = "Message must not be empty.");
     }else{
@@ -443,16 +453,21 @@ class _EditNotificationState extends State<EditNotification> {
       setState(() => errorTeam = null);
     }
 
-    if(title.text.isNotEmpty && msg.text.isNotEmpty && selectedUserList.isNotEmpty && _image != null && selectedDate !=null && selectedTime != null){
-      var res = await NotificationController.createNotification(
+    if(title.text.isNotEmpty && msg.text.isNotEmpty && selectedUserList.isNotEmpty &&  selectedDate !=null && selectedTime != null){
+      var res = await NotificationController.editNotification(
+            ID:widget.notification!.id.toString(),
           title: title.text,
           msg: msg.text,
           selectedTime: uploadTimeToServer,
           seletedDate: selectedDate!,
           userList: selectedUserList,
-          image: _image!
+          image: _image ?? null
       );
-      if(res){
+      if(res.statusCode == 200){
+        var data = json.decode(utf8.decode(await res.stream.toBytes()));
+        var outputDateFormat = DateFormat('yyyy-MM-dd');
+        var date = outputDateFormat.format(DateTime.parse("${data["date"]}"));
+
         errorTime = null;
         errorDate = null;
         errorTitle = null;
@@ -464,6 +479,9 @@ class _EditNotificationState extends State<EditNotification> {
           backgroundColor: Colors.green,
           duration: Duration(milliseconds: 3000),
         ));
+        print("data === ${data}");
+        NotificationController.sendFCMNotification(registration_ids: _getUserToken, title: title.text, message: msg.text, image: data["image"] ?? "", id: data["id"].toString(), dateTime: DateTime.parse("$date ${data["time"]}") );
+
         Get.to(AppBottomNavigation());
       }else{
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(

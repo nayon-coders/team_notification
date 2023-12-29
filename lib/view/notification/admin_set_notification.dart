@@ -10,6 +10,7 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:userapp/app_config.dart';
 import 'package:userapp/controller/notification_controller/notification_controller.dart';
 import 'package:userapp/controller/user_controller/userController.dart';
 import 'package:userapp/local_notification/fcm_notification.dart';
@@ -478,6 +479,7 @@ class _AdminSetNotificaionState extends State<AdminSetNotificaion> {
       );
       if(res.statusCode == 200){
         var data = json.decode(utf8.decode(await res.stream.toBytes()));
+
         print("data === ${data["image"]}");
         errorTime = null;
         errorDate = null;
